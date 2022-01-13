@@ -7,26 +7,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Random;
 
 import MCTS.pacman.controller.MctsPacman;
 import pacman.controllers.Controller;
 import pacman.controllers.HumanController;
-import pacman.controllers.KeyBoardInput;
-import pacman.controllers.examples.AggressiveGhosts;
-import pacman.controllers.examples.Legacy;
-import pacman.controllers.examples.Legacy2TheReckoning;
-import pacman.controllers.examples.NearestPillPacMan;
-import pacman.controllers.examples.NearestPillPacManVS;
 import pacman.controllers.examples.RandomGhosts;
-import pacman.controllers.examples.RandomNonRevPacMan;
-import pacman.controllers.examples.RandomPacMan;
-import pacman.controllers.examples.StarterGhosts;
-import pacman.controllers.examples.StarterPacMan;
-import pacman.entries.pacman.NearestPowerPill;
-import pacman.entries.pacman.Test;
 import pacman.game.Game;
 import pacman.game.GameView;
 import static pacman.game.Constants.*;
@@ -50,15 +37,16 @@ public class Executor
 	{
 		int delay=10;
 		boolean visual=true;
-		int numTrials=10;
+		int numTrials=100;
 
 		Executor exec=new Executor();
+		Controller<MOVE> agent = new MctsPacman();
 
-		System.out.println("Running a Pacman Game Using Agents!");
-		exec.runGame(new HeuristicController(), new RandomGhosts(), visual, 10);
+//		System.out.println("Running a Pacman Game Using Agents!");
+//		exec.runGame(agent, new RandomGhosts(), visual, 1);
 
-//		System.out.println("MCTS PACMAN vs Starter Ghosts");
-//		exec.runExperiment(new MctsPacman(), new RandomGhosts(), numTrials);
+		System.out.println("MCTS PACMAN vs Starter Ghosts");
+		exec.runExperiment(agent, new RandomGhosts(), numTrials);
 //
 //		System.out.println("MCTS PACMAN vs Legacy Ghosts");
 //		exec.runExperiment(new MctsPacman(), new AggressiveGhosts(), numTrials);

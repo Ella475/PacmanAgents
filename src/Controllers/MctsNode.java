@@ -18,10 +18,10 @@ public class MctsNode {
 	public int junction = -1;
 	public int timesVisited = 0;
 	public MctsNode parent;
-	public ArrayList<MctsNode> children = new ArrayList<MctsNode>();
+	public ArrayList<MctsNode> children = new ArrayList<>();
 	public MOVE actionMove;
 	public double deltaReward;
-	public ArrayList<MOVE> triedMoves = new ArrayList<MOVE>();
+	public ArrayList<MOVE> triedMoves = new ArrayList<>();
 	public Game game;
 
 	public MctsNode(MctsNode parent, Game game, int junction) {
@@ -30,25 +30,23 @@ public class MctsNode {
 		this.deltaReward = -1.0f;
 		this.game = game;
 		this.junction = junction;
-		this.triedMoves.clear();
-		this.children.clear();
 	}
 
 	public MctsNode Expand() {
 		
 		MOVE nextMove = untriedMove(game);
-		
+
+		// Expanding MctsNode child
 	 	if((nextMove != game.getPacmanLastMoveMade().opposite())) {
-	 		
-	 		MctsNode expandedChild = GetClosestJunctionInDir(nextMove);
-	 		expandedChild.actionMove = nextMove;
-			//System.out.println("expanded child: " + expandedChild + "parent :" + expandedChild.parent + " Junction :" + expandedChild.junction + " Move: " + expandedChild.actionMove);
-			MctsController.tree_length ++;
-			this.children.add(expandedChild);
-			expandedChild.parent = this;
-			return expandedChild;
+	 		MctsNode child = GetClosestJunctionInDir(nextMove);
+			child.actionMove = nextMove;
+			MctsController.tree_length++;
+			this.children.add(child);
+			child.parent = this;
+			return child;
 		}
-	 	
+
+	 	// Otherwise
 		return this;
 	}
 
@@ -111,69 +109,56 @@ public class MctsNode {
     // Make pacman follow a path where only one move is possible (excluding reverse)
 	public MOVE GetMoveToFollowPath(Game state,MOVE direction) {
 		MOVE[] possibleMoves = state.getPossibleMoves(state.getPacmanCurrentNodeIndex());
-	    ArrayList<MOVE> moves = new ArrayList<MOVE>(Arrays.asList(possibleMoves));
-
-        if(moves.contains(direction)) return direction;
+	    ArrayList<MOVE> moves = new ArrayList<>(Arrays.asList(possibleMoves));
+        if(moves.contains(direction)) {
+        	return direction;
+		}
         moves.remove(state.getPacmanLastMoveMade().opposite());
         assert moves.size() == 1; // along a path there is only one possible way remaining
         return moves.get(0);
 	}
 
 	public boolean isTerminalGameState() {
-		if (game.wasPacManEaten() || game.getActivePillsIndices().length == 0) {
-			return true;
-		}
-		return false;
+		return game.wasPacManEaten() || game.getActivePillsIndices().length == 0;
 	}
 
 	//Pick randomly non-tried action
 	public MOVE untriedMove(Game game) {
-		ArrayList<MOVE> untriedMoves = new ArrayList<MOVE>();
-		MOVE untriedMove = null;
-		int current_node = game.getPacmanCurrentNodeIndex();
-		List<MOVE> possibleMoves = Arrays.asList(game.getPossibleMoves(current_node));
-	
-		if (possibleMoves.contains(MOVE.UP) && !triedMoves.contains(MOVE.UP)) {
-			untriedMoves.add(MOVE.UP);
-		}
-		if (possibleMoves.contains(MOVE.RIGHT) && !triedMoves.contains(MOVE.RIGHT)) {
-			untriedMoves.add(MOVE.RIGHT);
-		}
-		if (possibleMoves.contains(MOVE.DOWN) && !triedMoves.contains(MOVE.DOWN)) {
-			untriedMoves.add(MOVE.DOWN);
-		} 
-		if (possibleMoves.contains(MOVE.LEFT) && !triedMoves.contains(MOVE.LEFT)) {
-			untriedMoves.add(MOVE.LEFT);
+		ArrayList<MOVE> untriedMoves = new ArrayList<>();
+		int pacman = game.getPacmanCurrentNodeIndex();
+		List<MOVE> possibleMoves = Arrays.asList(game.getPossibleMoves(pacman));
+		MOVE[] moves = {MOVE.UP, MOVE.RIGHT, MOVE.DOWN, MOVE.LEFT};
+
+		for (MOVE m : moves) {
+			if (possibleMoves.contains(m) && !triedMoves.contains(m)) {
+				untriedMoves.add(m);
+			}
 		}
 		
-		untriedMove = untriedMoves.get(new Random().nextInt(untriedMoves.size()));
+		MOVE untriedMove = untriedMoves.get(new Random().nextInt(untriedMoves.size()));
 		triedMoves.add(untriedMove);
 		return untriedMove;
 	}
 	
 	public boolean isFullyExpanded() {
+		int current_node = game.getPacmanCurrentNodeIndex();
+		MOVE[] possibleMoves = game.getPossibleMoves(current_node);
+
 		if ( children.size() <= 0) {
 			return false;
 		}
-		
-		int current_node = game.getPacmanCurrentNodeIndex();
-		MOVE[] possibleMoves = game.getPossibleMoves(current_node);
-		
-		if(possibleMoves.length == triedMoves.size()) return true;
-		
-		if (possibleMoves.length != children.size()) {
-			return false;
-		} 
-		else {
+		if(possibleMoves.length == triedMoves.size()) {
 			return true;
 		}
+		return possibleMoves.length == children.size();
 	}
 	
 	public static int AvgDistanceFromGhosts(Game state) {
+		int numOfGhosts = state.getGhosts().size();
 		int sum = 0;
 		for(GHOST ghost : GHOST.values())
 			sum += state.getDistance(state.getPacmanCurrentNodeIndex(), state.getGhostCurrentNodeIndex(ghost), DM.PATH);
-		return sum/4;
+		return sum / numOfGhosts;
 	}
 	
 }

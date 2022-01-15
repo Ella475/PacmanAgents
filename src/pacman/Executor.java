@@ -18,6 +18,7 @@ import pacman.controllers.HumanController;
 import pacman.controllers.examples.AggressiveGhosts;
 import pacman.controllers.examples.Legacy2TheReckoning;
 import pacman.controllers.examples.RandomGhosts;
+import pacman.controllers.examples.StarterGhosts;
 import pacman.game.Game;
 import pacman.game.GameView;
 import static pacman.game.Constants.*;
@@ -45,37 +46,36 @@ public class Executor
 		boolean timeIt = false;
 		int numTrials=100;
 		int depth = 3;
+
+		// Choose pacman controller:
 		// MctsController, HeuristicController, MinimaxController, AlphaBetaController
 		String agentName = "MctsController";
-		// RandomGhosts, AggressiveGhosts, Legacy2TheReckoning
-		String ghostType = "Legacy2TheReckoning";
+
+		// Choose ghosts controller:
+		// RandomGhosts, StarterGhosts, AggressiveGhosts, Legacy2TheReckoning
+		String ghostType = "RandomGhosts";
 
 		// Do not change code below
 		Executor exec=new Executor();
-		Controller<MOVE> agent;
-		if (agentName.equals("MctsController"))
-			agent = new MctsController();
-		else if (agentName.equals("HeuristicController"))
-			agent = new HeuristicController();
-		else if (agentName.equals("MinimaxController"))
-			agent = new MinimaxController(depth);
-		else
-			agent = new AlphaBetaController(depth);
+		Controller<MOVE> agent = switch (agentName) {
+			case "MctsController" -> new MctsController();
+			case "HeuristicController" -> new HeuristicController();
+			case "MinimaxController" -> new MinimaxController(depth);
+			default -> new AlphaBetaController(depth);
+		};
 
-		Controller<EnumMap<GHOST,MOVE>> ghosts;
-		if (ghostType.equals("RandomGhosts"))
-			ghosts = new RandomGhosts();
-		else if (ghostType.equals("AggressiveGhosts"))
-			ghosts = new AggressiveGhosts();
-		else
-			ghosts = new Legacy2TheReckoning();
+		Controller<EnumMap<GHOST,MOVE>> ghosts = switch (ghostType) {
+			case "RandomGhosts" -> new RandomGhosts();
+			case "AggressiveGhosts" -> new AggressiveGhosts();
+			case "StarterGhosts" -> new StarterGhosts();
+			default -> new Legacy2TheReckoning();
+		};
 
 
-		if (visual)
-			if (timeIt)
-				exec.runGameTimed(agent, ghosts, visual);
-			else
-				exec.runGame(agent, ghosts, visual, delay);
+		if (visual && timeIt)
+			exec.runGameTimed(agent, ghosts, visual);
+		else if (visual)
+			exec.runGame(agent, ghosts, visual, delay);
 		else
 			exec.runExperiment(agent, ghosts, numTrials);
 	}

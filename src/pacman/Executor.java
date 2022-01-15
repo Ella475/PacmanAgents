@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Random;
 
-import MCTS.pacman.controller.MctsPacman;
+import Controllers.AlphaBetaController;
+import Controllers.MinimaxController;
+import Controllers.MctsController;
 import pacman.controllers.Controller;
 import pacman.controllers.HumanController;
+import pacman.controllers.examples.AggressiveGhosts;
+import pacman.controllers.examples.Legacy2TheReckoning;
 import pacman.controllers.examples.RandomGhosts;
 import pacman.game.Game;
 import pacman.game.GameView;
@@ -35,38 +39,45 @@ public class Executor
 	 */
 	public static void main(String[] args)
 	{
-		int delay=10;
+		// change parameters
+		int delay=1;
 		boolean visual=true;
+		boolean timeIt = false;
 		int numTrials=100;
+		int depth = 3;
+		// MctsController, HeuristicController, MinimaxController, AlphaBetaController
+		String agentName = "MctsController";
+		// RandomGhosts, AggressiveGhosts, Legacy2TheReckoning
+		String ghostType = "Legacy2TheReckoning";
 
+		// Do not change code below
 		Executor exec=new Executor();
-		Controller<MOVE> agent = new MctsPacman();
+		Controller<MOVE> agent;
+		if (agentName.equals("MctsController"))
+			agent = new MctsController();
+		else if (agentName.equals("HeuristicController"))
+			agent = new HeuristicController();
+		else if (agentName.equals("MinimaxController"))
+			agent = new MinimaxController(depth);
+		else
+			agent = new AlphaBetaController(depth);
 
-//		System.out.println("Running a Pacman Game Using Agents!");
-//		exec.runGame(agent, new RandomGhosts(), visual, 1);
+		Controller<EnumMap<GHOST,MOVE>> ghosts;
+		if (ghostType.equals("RandomGhosts"))
+			ghosts = new RandomGhosts();
+		else if (ghostType.equals("AggressiveGhosts"))
+			ghosts = new AggressiveGhosts();
+		else
+			ghosts = new Legacy2TheReckoning();
 
-		System.out.println("MCTS PACMAN vs Starter Ghosts");
-		exec.runExperiment(agent, new RandomGhosts(), numTrials);
-//
-//		System.out.println("MCTS PACMAN vs Legacy Ghosts");
-//		exec.runExperiment(new MctsPacman(), new AggressiveGhosts(), numTrials);
-//
-//		System.out.println("MCTS PACMAN vs Legacy2TheReckoning Ghosts");
-//		exec.runExperiment(new MctsPacman(), new Legacy2TheReckoning(),numTrials);
-//
-//		System.out.println("MCTS PACMAN vs RandomGhosts");
-//		exec.runExperiment(new MctsPacman(), new RandomGhosts(),numTrials);
-//
-//		System.out.println("MCTS PACMAN vs Aggresive Ghosts");
-//		exec.runExperiment(new MctsPacman(), new AggressiveGhosts(),numTrials);
 
-  		 
-		
-		/* run the game in asynchronous mode. */
-		
-//		exec.runGameTimed(new MyPacMan(),new AggressiveGhosts(),visual);
-//		exec.runGameTimed(new RandomPacMan(), new AvengersEvolution(evolutionFile),visual);
-//		exec.runGameTimed(new HumanController(new KeyBoardInput()),new StarterGhosts(),visual);	
+		if (visual)
+			if (timeIt)
+				exec.runGameTimed(agent, ghosts, visual);
+			else
+				exec.runGame(agent, ghosts, visual, delay);
+		else
+			exec.runExperiment(agent, ghosts, numTrials);
 	}
 	
     /**

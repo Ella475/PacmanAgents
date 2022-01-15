@@ -34,7 +34,7 @@ public class HeuristicController extends Controller<MOVE> {
     public static double getGameScore(Game state) {
         if (state.wasPacManEaten()) return Double.NEGATIVE_INFINITY;
 
-        double foodScore = 10 * hasFood(state);
+        double foodScore = 100 * hasFood(state);
         double activeGhostScore = 0;
         double scaredGhostScore = 50 * hasScaredGhost(state);
         double capsuleScore = 100 * hasCapsule(state);
@@ -89,9 +89,8 @@ public class HeuristicController extends Controller<MOVE> {
             capsuleScore += 10 * (double) (1 / closestCapsule);
         }
 
-        double isFood = state.wasPillEaten() ? 100 : 0;
 
-        return foodScore + activeGhostScore + scaredGhostScore + capsuleScore + isFood;
+        return foodScore + activeGhostScore + scaredGhostScore + capsuleScore;
     }
 
     public static double getScoreOfMove(Game game, MOVE m) {

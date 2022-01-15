@@ -1,4 +1,4 @@
-package MCTS.pacman.controller;
+package Controllers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,16 +10,8 @@ import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.controllers.Controller;
-import pacman.controllers.examples.RandomPacMan;
-import pacman.controllers.examples.StarterGhosts;
 import pacman.game.Game;
 
-// s@Author P.Migkotzidis
-
-/*Summary : MCTSNode object represent each node in the MCTS tree.
-Visually every node corresponds to a specific junction in the maze.
-The number of children of a MCTSNode in the tree is the number of closest available junctions.
-*/
 
 public class MctsNode {
 
@@ -51,7 +43,7 @@ public class MctsNode {
 	 		MctsNode expandedChild = GetClosestJunctionInDir(nextMove);
 	 		expandedChild.actionMove = nextMove;
 			//System.out.println("expanded child: " + expandedChild + "parent :" + expandedChild.parent + " Junction :" + expandedChild.junction + " Move: " + expandedChild.actionMove);
-			MctsPacman.tree_length ++;
+			MctsController.tree_length ++;
 			this.children.add(expandedChild);
 			expandedChild.parent = this;
 			return expandedChild;
@@ -64,7 +56,7 @@ public class MctsNode {
 	public MctsNode GetClosestJunctionInDir(MOVE dir) {
 		
 		Game state = game.copy();
-		Controller<EnumMap<GHOST, MOVE>> ghostController = MctsPacman.ghosts;
+		Controller<EnumMap<GHOST, MOVE>> ghostController = MctsController.ghosts;
 		
 		int from = state.getPacmanCurrentNodeIndex();
 		int current = from;

@@ -57,19 +57,37 @@ public class Executor
 
 		// Do not change code below
 		Executor exec=new Executor();
-		Controller<MOVE> agent = switch (agentName) {
-			case "MctsController" -> new MctsController();
-			case "HeuristicController" -> new HeuristicController();
-			case "MinimaxController" -> new MinimaxController(depth);
-			default -> new AlphaBetaController(depth);
-		};
+		Controller<MOVE> agent;
+		switch (agentName) {
+			case "MctsController":
+				agent = new MctsController();
+				break;
+			case "HeuristicController":
+				agent = new HeuristicController();
+				break;
+			case "MinimaxController":
+				agent = new MinimaxController(depth);
+				break;
+			default:
+				agent = new AlphaBetaController(depth);
+				break;
+		}
 
-		Controller<EnumMap<GHOST,MOVE>> ghosts = switch (ghostType) {
-			case "RandomGhosts" -> new RandomGhosts();
-			case "AggressiveGhosts" -> new AggressiveGhosts();
-			case "StarterGhosts" -> new StarterGhosts();
-			default -> new Legacy2TheReckoning();
-		};
+		Controller<EnumMap<GHOST, MOVE>> ghosts;
+		switch (ghostType) {
+			case "RandomGhosts":
+				ghosts = new RandomGhosts();
+				break;
+			case "AggressiveGhosts":
+				ghosts = new AggressiveGhosts();
+				break;
+			case "StarterGhosts":
+				ghosts = new StarterGhosts();
+				break;
+			default:
+				ghosts = new Legacy2TheReckoning();
+				break;
+		}
 
 
 		if (visual && timeIt)
@@ -364,7 +382,7 @@ public class Executor
     //load a replay
     private static ArrayList<String> loadReplay(String fileName)
 	{
-    	ArrayList<String> replay=new ArrayList<String>();
+    	ArrayList<String> replay=new ArrayList<>();
 		
         try
         {         	

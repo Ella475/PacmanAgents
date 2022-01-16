@@ -48,7 +48,7 @@ public class Executor
 		// MctsController, HeuristicController, MinimaxController, AlphaBetaController
 		String agentName = "MctsController";
 		// RandomGhosts, AggressiveGhosts, Legacy2TheReckoning
-		String ghostType = "Legacy2TheReckoning";
+		String ghostType = "RandomGhosts";
 
 		// Do not change code below
 		Executor exec=new Executor();

@@ -50,7 +50,7 @@ public class MctsController extends Controller<MOVE> {
 
     public MOVE FollowPath(MOVE dir, Game state) {
         MOVE[] possibleMoves = state.getPossibleMoves(state.getPacmanCurrentNodeIndex());
-        ArrayList<MOVE> moves = new ArrayList<MOVE>(Arrays.asList(possibleMoves));
+        ArrayList<MOVE> moves = new ArrayList<>(Arrays.asList(possibleMoves));
 
         int current = state.getPacmanCurrentNodeIndex();
         //EVADE GHOSTS DURING PATH
@@ -62,9 +62,9 @@ public class MctsController extends Controller<MOVE> {
             }
         }
 
-		if (moves.contains(dir)) {
-			return dir;
-		}
+        if (moves.contains(dir)) {
+            return dir;
+        }
         moves.remove(state.getPacmanLastMoveMade().opposite());
         assert moves.size() == 1; // along a path there is only one possible way remaining
 
@@ -84,9 +84,9 @@ public class MctsController extends Controller<MOVE> {
 
         while (new Date().getTime() < start + 30 && tree_length <= TREE_LIMIT) {
             MctsNode nd = SelectionPolicy(root);
-			if (nd == null) {
-				return MOVE.DOWN;
-			}
+            if (nd == null) {
+                return MOVE.DOWN;
+            }
             float reward = SimulationPolicy(nd);
             Backpropagation(nd, reward);
         }
@@ -103,13 +103,13 @@ public class MctsController extends Controller<MOVE> {
 
     public MctsNode SelectionPolicy(MctsNode nd) {
         if (nd == null) {
-            return nd;
+            return null;
         }
-        while (!nd.isTerminalGameState()) {
+        if (!nd.isTerminalGameState()) {
             if (!nd.isFullyExpanded()) {
                 return nd.Expand();
             } else {
-                return nd = SelectionPolicy(BestChild(nd, C));
+                return SelectionPolicy(BestChild(nd, C));
             }
         }
         return nd;
@@ -122,9 +122,9 @@ public class MctsController extends Controller<MOVE> {
         int steps = 0;
         Controller<MOVE> pacManController = new RandomPacMan();
         Controller<EnumMap<GHOST, MOVE>> ghostController = ghosts;
-		if (nd == null) {
-			return 0;
-		}
+        if (nd == null) {
+            return 0;
+        }
         Game state = nd.game.copy();
         int pillsBefore = state.getNumberOfActivePills();
         int livesBefore = state.getPacmanNumberOfLivesRemaining();

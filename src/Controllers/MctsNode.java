@@ -123,7 +123,7 @@ public class MctsNode {
         moves.remove(state.getPacmanLastMoveMade().opposite());
         assert moves.size() == 1; // along a path there is only one possible way remaining
         return moves.get(0);
-    }
+	}
 
     public boolean isTerminalGameState() {
         return game.wasPacManEaten() || game.getActivePillsIndices().length == 0;

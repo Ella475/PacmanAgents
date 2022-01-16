@@ -116,11 +116,11 @@ public class MctsController extends Controller<MOVE> {
         if (nd == null) {
             return null;
         }
-        if (!nd.isTerminalGameState()) {
+        while (!nd.isTerminalGameState()) {
             if (!nd.isFullyExpanded()) {
                 return nd.Expand();
             } else {
-                return SelectionPolicy(BestChild(nd, C));
+                nd = SelectionPolicy(BestChild(nd, C));
             }
         }
         return nd;
@@ -128,29 +128,28 @@ public class MctsController extends Controller<MOVE> {
 
 
     public float SimulationPolicy(MctsNode nd) {
+        // Check null
+        if (nd == null)
+            return 0;
 
-        float reward = 0;
+        // If died on the way to the junction
+        if (nd.deltaReward == 0.0f)
+            return 0;
+
         int steps = 0;
         Controller<MOVE> pacManController = new RandomPacMan();
         Controller<EnumMap<GHOST, MOVE>> ghostController = ghosts;
-        if (nd == null) {
-            return 0;
-        }
+
         Game state = nd.game.copy();
         int pillsBefore = state.getNumberOfActivePills();
         int livesBefore = state.getPacmanNumberOfLivesRemaining();
 
-        // if died during reaching the junction
-        if (nd.deltaReward == 0.0f) {
-            return 0;
-        }
-
+        // simulate
         while (!state.gameOver()) {
-
             //advance game
-            state.advanceGame(pacManController.getMove(state, System.currentTimeMillis()),
-                    ghostController.getMove(state, System.currentTimeMillis()));
-
+            MOVE pacmanMove = pacManController.getMove(state, System.currentTimeMillis());
+            EnumMap<GHOST, MOVE> ghostsMoves = ghostController.getMove(state, System.currentTimeMillis());
+            state.advanceGame(pacmanMove, ghostsMoves);
             steps++;
 
             if (steps >= SIMULATION_STEPS) {

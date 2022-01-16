@@ -22,8 +22,8 @@ public class MctsNode {
     public MOVE actionMove;
     public double deltaReward;
     public ArrayList<MOVE> triedMoves = new ArrayList<>();
-	public ArrayList<MOVE> untriedMoves = new ArrayList<>();
-	public Game game;
+    public ArrayList<MOVE> untriedMoves = new ArrayList<>();
+    public Game game;
 
     public MctsNode(MctsNode parent, Game game, int junction) {
         this.parent = parent;
@@ -31,14 +31,14 @@ public class MctsNode {
         this.deltaReward = -1.0f;
         this.game = game;
         this.junction = junction;
-	}
+    }
 
     public static int AvgDistanceFromGhosts(Game state) {
         int sum = 0;
         int pacmanIndex = state.getPacmanCurrentNodeIndex();
-		for (GHOST ghost : GHOST.values()) {
-			sum += state.getDistance(pacmanIndex, state.getGhostCurrentNodeIndex(ghost), DM.PATH);
-		}
+        for (GHOST ghost : GHOST.values()) {
+            sum += state.getDistance(pacmanIndex, state.getGhostCurrentNodeIndex(ghost), DM.PATH);
+        }
         return sum / 4;
     }
 
@@ -49,7 +49,7 @@ public class MctsNode {
         if (nextMove != game.getPacmanLastMoveMade().opposite()) {
             MctsNode expandedChild = GetClosestJunctionInDir(nextMove);
             expandedChild.actionMove = nextMove;
-            MctsController.tree_length++;
+            MctsController.tree_depth++;
             this.children.add(expandedChild);
             expandedChild.parent = this;
             return expandedChild;
@@ -65,7 +65,7 @@ public class MctsNode {
 
         int from = state.getPacmanCurrentNodeIndex();
         int current = from;
-        MOVE currentPacmanDir;
+        MOVE currentPacmanDir = dir;
 
         //Simulation reward variables
         int pillsBefore = state.getNumberOfActivePills();
@@ -77,7 +77,7 @@ public class MctsNode {
         while (!state.isJunction(current) || current == from) {
 
             //make pacman follow the path
-            currentPacmanDir = GetMoveToFollowPath(state);
+            currentPacmanDir = GetMoveToFollowPath(state, currentPacmanDir);
 
             //advance game state
             state.advanceGame(currentPacmanDir,
@@ -113,36 +113,39 @@ public class MctsNode {
     }
 
     // Make pacman follow a path where only one move is possible (excluding reverse)
-    public MOVE GetMoveToFollowPath(Game state) {
+    public MOVE GetMoveToFollowPath(Game state, MOVE direction) {
         MOVE[] possibleMoves = state.getPossibleMoves(state.getPacmanCurrentNodeIndex());
         ArrayList<MOVE> moves = new ArrayList<>(Arrays.asList(possibleMoves));
 
+        if (moves.contains(direction)) {
+            return direction;
+        }
         moves.remove(state.getPacmanLastMoveMade().opposite());
         assert moves.size() == 1; // along a path there is only one possible way remaining
         return moves.get(0);
     }
 
     public boolean isTerminalGameState() {
-		return game.wasPacManEaten() || game.getActivePillsIndices().length == 0;
-	}
+        return game.wasPacManEaten() || game.getActivePillsIndices().length == 0;
+    }
 
-	public void updateUntriedMoves(Game game) {
-		untriedMoves.clear();
-		int current_node = game.getPacmanCurrentNodeIndex();
-		List<MOVE> possibleMoves = Arrays.asList(game.getPossibleMoves(current_node));
-		List<MOVE> gameMoves = Arrays.asList(MOVE.UP, MOVE.RIGHT, MOVE.DOWN, MOVE.LEFT);
+    public void updateUntriedMoves(Game game) {
+        untriedMoves.clear();
+        int current_node = game.getPacmanCurrentNodeIndex();
+        List<MOVE> possibleMoves = Arrays.asList(game.getPossibleMoves(current_node));
+        List<MOVE> gameMoves = Arrays.asList(MOVE.UP, MOVE.RIGHT, MOVE.DOWN, MOVE.LEFT);
 
-		for (MOVE move : gameMoves) {
-			if (possibleMoves.contains(move) && !triedMoves.contains(move)) {
-				untriedMoves.add(move);
-			}
-		}
+        for (MOVE move : gameMoves) {
+            if (possibleMoves.contains(move) && !triedMoves.contains(move)) {
+                untriedMoves.add(move);
+            }
+        }
     }
 
     //Pick randomly non-tried action
     public MOVE untriedMove(Game game) {
-		updateUntriedMoves(game);
-		MOVE untriedMove = untriedMoves.get(new Random().nextInt(untriedMoves.size()));
+        updateUntriedMoves(game);
+        MOVE untriedMove = untriedMoves.get(new Random().nextInt(untriedMoves.size()));
         triedMoves.add(untriedMove);
         return untriedMove;
     }
@@ -154,12 +157,7 @@ public class MctsNode {
 
         int current_node = game.getPacmanCurrentNodeIndex();
         MOVE[] possibleMoves = game.getPossibleMoves(current_node);
-
-		if (possibleMoves.length == triedMoves.size()) {
-			return true;
-		}
-
-		return possibleMoves.length == children.size();
+        return possibleMoves.length == children.size() || possibleMoves.length == triedMoves.size();
     }
 
 

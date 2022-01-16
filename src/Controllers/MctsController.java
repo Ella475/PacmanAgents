@@ -10,6 +10,7 @@ import pacman.game.Game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 
@@ -21,9 +22,11 @@ public class MctsController extends Controller<MOVE> {
     public static final int ghost_dist = 9;
     public static final int hunt_dist = 25;
     public static final int TREE_LIMIT = 35;
+    public static final int SEARCH_TIME_LIMIT = 50;
+    public static final int SIMULATION_STEPS = 30;
     //PROPERTIES
     public static Controller<EnumMap<GHOST, MOVE>> ghosts = new StarterGhosts();
-    public static int tree_length = 0;
+    public static int tree_depth = 0;
 
     @Override
     public MOVE getMove(Game game, long timeDue) {
@@ -39,7 +42,7 @@ public class MctsController extends Controller<MOVE> {
 
         // run Mcts when in a junction to get next move (next move is based on next junction)
         if (pacmanInJunction(game)) {
-            tree_length = 0;
+            tree_depth = 0;
             return MctsSearch(game);
         }
 
@@ -54,12 +57,21 @@ public class MctsController extends Controller<MOVE> {
 
         int current = state.getPacmanCurrentNodeIndex();
         //EVADE GHOSTS DURING PATH
+        ArrayList<MOVE> getAwayMove = new ArrayList<>();
+        ArrayList<Integer> closeGhostDists = new ArrayList<>();
         for (GHOST ghost : GHOST.values()) {
             if (state.getGhostEdibleTime(ghost) == 0 && state.getGhostLairTime(ghost) == 0) {
-                if (state.getShortestPathDistance(current, state.getGhostCurrentNodeIndex(ghost)) < ghost_dist) {
-                    return state.getNextMoveAwayFromTarget(current, state.getGhostCurrentNodeIndex(ghost), DM.PATH);
+                int ghostDist = state.getShortestPathDistance(current, state.getGhostCurrentNodeIndex(ghost));
+                if (ghostDist < ghost_dist) {
+                    getAwayMove.add(state.getNextMoveAwayFromTarget(current, state.getGhostCurrentNodeIndex(ghost),
+                            DM.PATH));
+                    closeGhostDists.add(ghostDist);
                 }
             }
+        }
+
+        if (getAwayMove.size() > 0) {
+            return getAwayMove.get(closeGhostDists.indexOf(Collections.min(closeGhostDists)));
         }
 
         if (moves.contains(dir)) {
@@ -67,7 +79,6 @@ public class MctsController extends Controller<MOVE> {
         }
         moves.remove(state.getPacmanLastMoveMade().opposite());
         assert moves.size() == 1; // along a path there is only one possible way remaining
-
         return moves.get(0);
     }
 
@@ -82,7 +93,7 @@ public class MctsController extends Controller<MOVE> {
 
         long start = new Date().getTime();
 
-        while (new Date().getTime() < start + 30 && tree_length <= TREE_LIMIT) {
+        while (new Date().getTime() < start + SEARCH_TIME_LIMIT && tree_depth <= TREE_LIMIT) {
             MctsNode nd = SelectionPolicy(root);
             if (nd == null) {
                 return MOVE.DOWN;
@@ -142,7 +153,7 @@ public class MctsController extends Controller<MOVE> {
 
             steps++;
 
-            if (steps >= 15) {
+            if (steps >= SIMULATION_STEPS) {
                 break;
             }
         }
@@ -190,5 +201,4 @@ public class MctsController extends Controller<MOVE> {
             currentNode = currentNode.parent;
         }
     }
-
 }

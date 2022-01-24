@@ -121,6 +121,9 @@ public class MctsController extends Controller<MOVE> {
                 return nd.Expand();
             } else {
                 nd = SelectionPolicy(BestChild(nd, C));
+                if (nd == null) {
+                    break;
+                }
             }
         }
         return nd;

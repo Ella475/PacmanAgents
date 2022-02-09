@@ -4,6 +4,7 @@ import pacman.controllers.Controller;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
+import static Controllers.MinimaxController.evaluationFunction;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -29,7 +30,7 @@ public class AlphaBetaController extends Controller<MOVE> {
         }
 
         if (game.gameOver() || depth == 0) {
-            return new MoveScorePair<>(null, game.getScore());
+            return new MoveScorePair<>(null, evaluationFunction(game));
         }
 
         ArrayList<MoveScorePair<MOVE, Integer>> actionsValues = new ArrayList<>();

@@ -45,7 +45,7 @@ public class Executor
 		boolean visual=true;
 		boolean timeIt = false;
 		int numTrials=100;
-		int depth = 3;
+		int depth = 2;
 
 		// Choose pacman controller:
 		// MctsController, HeuristicController, MinimaxController, AlphaBetaController

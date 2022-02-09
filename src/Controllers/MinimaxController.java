@@ -6,6 +6,7 @@ import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 
 
@@ -21,6 +22,57 @@ public class MinimaxController extends Controller<MOVE> {
         return isGreater == (a > b);
     }
 
+    public static Integer evaluationFunction(Game state) {
+        if (state.gameOver()) {
+            if (state.wasPacManEaten())
+                return Integer.MIN_VALUE;
+            else
+                return Integer.MAX_VALUE;
+        }
+
+        int currentScore = state.getScore();
+        int powerPillsLeft = state.getNumberOfActivePowerPills();
+        int pillsLeft = state.getNumberOfActivePills();
+
+        int pacmanIndex = state.getPacmanCurrentNodeIndex();
+
+
+        ArrayList<Integer> distanceToFood = new ArrayList<>();
+        for (int i : state.getActivePillsIndices()) {
+            distanceToFood.add(state.getShortestPathDistance(pacmanIndex, i));
+        }
+        int closestFood = Collections.min(distanceToFood);
+
+
+        ArrayList<Integer> distancesToScaredGhosts = new ArrayList<>();
+        ArrayList<Integer> distancesToActiveGhosts = new ArrayList<>();
+        for (GHOST g : state.getGhosts()) {
+            int ghostIndex = state.getGhostCurrentNodeIndex(g);
+            int d = state.getShortestPathDistance(pacmanIndex, ghostIndex);
+            if (state.getGhostEdibleTime(g) > 0) {
+                distancesToScaredGhosts.add(d);
+            } else {
+                distancesToActiveGhosts.add(d);
+            }
+        }
+
+        int closestActiveGhost = Integer.MAX_VALUE, closestScaredGhost = Integer.MAX_VALUE;
+        if (distancesToActiveGhosts.size() > 0) {
+            closestActiveGhost = Collections.min(distancesToActiveGhosts);
+        }
+
+        if (distancesToScaredGhosts.size() > 0) {
+            closestScaredGhost = Collections.min(distancesToScaredGhosts);
+        }
+
+        return (int) (currentScore +
+                -1.5 * closestFood +
+                -2 * (1/closestActiveGhost) +
+                -2 * closestScaredGhost +
+                -20 * powerPillsLeft +
+                -4 * pillsLeft);
+    }
+
     public MoveScorePair<MOVE, Integer> minimax(Game game, int agentIndex, int depth) {
         int numOfAgents = game.getGhosts().size() + 1;
 
@@ -30,7 +82,7 @@ public class MinimaxController extends Controller<MOVE> {
         }
 
         if (game.gameOver() || depth == 0) {
-            return new MoveScorePair<>(null, game.getScore());
+            return new MoveScorePair<>(null, evaluationFunction(game));
         }
 
         ArrayList<MoveScorePair<MOVE, Integer>> actionsValues = new ArrayList<>();

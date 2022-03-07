@@ -12,7 +12,7 @@ import java.util.Random;
 
 import Agents.AlphaBetaAgent;
 import Agents.MinimaxAgent;
-import Agents.MctsAgent;
+import Agents.MCTS.MctsAgent;
 import pacman.controllers.Controller;
 import pacman.controllers.HumanController;
 import pacman.controllers.examples.AggressiveGhosts;
@@ -48,8 +48,8 @@ public class Executor
 		int depth = 2;
 
 		// Choose pacman controller:
-		// MctsController, HeuristicController, MinimaxController, AlphaBetaController
-		String agentName = "MctsController";
+		// MctsAgent, HeuristicAgent, MinimaxAgent, AlphaBetaAgent
+		String agentName = "MctsAgent";
 
 		// Choose ghosts controller:
 		// RandomGhosts, StarterGhosts, AggressiveGhosts, Legacy2TheReckoning
@@ -59,13 +59,13 @@ public class Executor
 		Executor exec=new Executor();
 		Controller<MOVE> agent;
 		switch (agentName) {
-			case "MctsController":
+			case "MctsAgent":
 				agent = new MctsAgent();
 				break;
-			case "HeuristicController":
+			case "HeuristicAgent":
 				agent = new HeuristicAgent();
 				break;
-			case "MinimaxController":
+			case "MinimaxAgent":
 				agent = new MinimaxAgent(depth);
 				break;
 			default:

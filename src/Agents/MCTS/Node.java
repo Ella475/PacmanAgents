@@ -1,4 +1,4 @@
-package Agents;
+package Agents.MCTS;
 
 import pacman.controllers.Controller;
 import pacman.game.Constants.DM;
@@ -75,9 +75,9 @@ public class Node {
         MOVE currentPacmanDir = dir;
 
         //Simulation reward variables
-        int pillsBefore = state.getAmountOfRemainingPills();
-        int capsulesBefore = state.getAmountOfRemainingPowerPills();
-        int livesBefore = state.getLivesRemaining();
+        int prevPills = state.getAmountOfRemainingPills();
+        int prevCapsules = state.getAmountOfRemainingPowerPills();
+        int prevLives = state.getLivesRemaining();
 
         // use current == from , so we skip the junction we are currently in
         while (!state.isJunction(current) || current == from) {
@@ -101,18 +101,17 @@ public class Node {
             current = state.getPacmanPosition();
         }
 
-        int livesAfter = state.getLivesRemaining();
-        int pillsAfter = state.getAmountOfRemainingPills();
-        int capsulesAfter = state.getAmountOfRemainingPowerPills();
-
+        int currLives = state.getLivesRemaining();
+        int currPills = state.getAmountOfRemainingPills();
+        int currCapsules = state.getAmountOfRemainingPowerPills();
         Node node = new Node(this, state);
+
         //dead during transition
-        if (livesAfter < livesBefore
-                || capsulesAfter < capsulesBefore && ghostDistAvg(state) > 100) {
+        if (currLives < prevLives || currCapsules < prevCapsules && ghostDistAvg(state) > 100) {
             node.reward = 0.0f;
         }
         //alive but no pills eaten
-        else if (pillsAfter == pillsBefore) {
+        else if (currPills == prevPills) {
             node.reward = 0.2f;
         }
         //pills eaten and alive

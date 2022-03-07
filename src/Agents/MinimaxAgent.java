@@ -1,4 +1,4 @@
-package Controllers;
+package Agents;
 
 import pacman.controllers.Controller;
 import pacman.game.Constants.GHOST;
@@ -10,11 +10,11 @@ import java.util.Collections;
 import java.util.EnumMap;
 
 
-public class MinimaxController extends Controller<MOVE> {
+public class MinimaxAgent extends Controller<MOVE> {
 
     public int treeDepth;
 
-    public MinimaxController(int d) {
+    public MinimaxAgent(int d) {
         this.treeDepth = d;
     }
 

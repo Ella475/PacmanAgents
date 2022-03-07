@@ -1,4 +1,4 @@
-package Controllers;
+package Agents;
 
 import pacman.controllers.Controller;
 import pacman.controllers.examples.RandomPacMan;
@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.EnumMap;
 
 
-public class MctsController extends Controller<MOVE> {
+public class MctsAgent extends Controller<MOVE> {
 
     //CONSTANTS
     public static final double C = 1.0f / Math.sqrt(2.0f);
@@ -89,12 +89,12 @@ public class MctsController extends Controller<MOVE> {
     public MOVE MctsSearch(Game game) {
 
         //create root node with state0
-        MctsNode root = new MctsNode(null, game, game.getPacmanCurrentNodeIndex());
+        Node root = new Node(null, game, game.getPacmanCurrentNodeIndex());
 
         long start = new Date().getTime();
 
         while (new Date().getTime() < start + SEARCH_TIME_LIMIT && tree_depth <= TREE_LIMIT) {
-            MctsNode nd = SelectionPolicy(root);
+            Node nd = SelectionPolicy(root);
             if (nd == null) {
                 return MOVE.DOWN;
             }
@@ -102,7 +102,7 @@ public class MctsController extends Controller<MOVE> {
             Backpropagation(nd, reward);
         }
 
-        MctsNode bestChild = BestChild(root, 0);
+        Node bestChild = BestChild(root, 0);
 
         if (bestChild == null) {
             return new RandomPacMan().getMove(game, -1);
@@ -112,7 +112,7 @@ public class MctsController extends Controller<MOVE> {
     }
 
 
-    public MctsNode SelectionPolicy(MctsNode nd) {
+    public Node SelectionPolicy(Node nd) {
         if (nd == null) {
             return null;
         }
@@ -130,7 +130,7 @@ public class MctsController extends Controller<MOVE> {
     }
 
 
-    public float SimulationPolicy(MctsNode nd) {
+    public float SimulationPolicy(Node nd) {
         // Check null
         if (nd == null)
             return 0;
@@ -175,13 +175,13 @@ public class MctsController extends Controller<MOVE> {
         return 1.0f - ((float) state.getNumberOfActivePills() / ((float) pillsBefore));
     }
 
-    public MctsNode BestChild(MctsNode nd, double C) {
-        MctsNode bestChild = null;
+    public Node BestChild(Node nd, double C) {
+        Node bestChild = null;
         double bestValue = -1.0f;
 
         for (int i = 0; i < nd.children.size(); i++) {
 
-            MctsNode node = nd.children.get(i);
+            Node node = nd.children.get(i);
             double uctValue = UCTvalue(node, C);
 
             if (uctValue >= bestValue) {
@@ -192,13 +192,13 @@ public class MctsController extends Controller<MOVE> {
         return bestChild;
     }
 
-    private double UCTvalue(MctsNode nd, double C) {
-        return (float) ((nd.deltaReward / nd.timesVisited) + C * Math.sqrt(2 * Math.log(nd.parent.timesVisited) / nd.timesVisited));
+    private double UCTvalue(Node nd, double C) {
+        return (float) ((nd.deltaReward / nd.visitCount) + C * Math.sqrt(2 * Math.log(nd.parent.visitCount) / nd.visitCount));
     }
 
-    private void Backpropagation(MctsNode currentNode, double reward) {
+    private void Backpropagation(Node currentNode, double reward) {
         while (currentNode != null) {
-            currentNode.timesVisited++;
+            currentNode.visitCount++;
             currentNode.deltaReward += reward;
             currentNode = currentNode.parent;
         }

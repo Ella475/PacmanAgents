@@ -1,19 +1,19 @@
-package Controllers;
+package Agents;
 
 import pacman.controllers.Controller;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
-import static Controllers.MinimaxController.evaluationFunction;
+import static Agents.MinimaxAgent.evaluationFunction;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 
-public class AlphaBetaController extends Controller<MOVE> {
+public class AlphaBetaAgent extends Controller<MOVE> {
 
     public int treeDepth;
 
-    public AlphaBetaController(int d) {
+    public AlphaBetaAgent(int d) {
         this.treeDepth = d;
     }
 

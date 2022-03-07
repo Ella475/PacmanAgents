@@ -1,4 +1,4 @@
-package Controllers;
+package Agents;
 
 import pacman.controllers.Controller;
 import pacman.game.Constants.DM;
@@ -13,43 +13,48 @@ import java.util.List;
 import java.util.Random;
 
 
-public class MctsNode {
+public class Node {
 
     public int junction;
-    public int timesVisited = 0;
-    public MctsNode parent;
-    public ArrayList<MctsNode> children = new ArrayList<>();
-    public MOVE actionMove;
-    public double deltaReward;
+    public int visitCount = 0;
+    public Node parent;
+    public ArrayList<Node> children = new ArrayList<>();
+    public MOVE actionMove = MOVE.UP;
+    public double deltaReward = -1.0f;
     public ArrayList<MOVE> triedMoves = new ArrayList<>();
     public ArrayList<MOVE> untriedMoves = new ArrayList<>();
     public Game game;
 
-    public MctsNode(MctsNode parent, Game game, int junction) {
+    public Node(Node parent, Game game, int junction) {
         this.parent = parent;
-        this.actionMove = MOVE.UP;
-        this.deltaReward = -1.0f;
-        this.game = game;
         this.junction = junction;
+        this.game = game;
     }
 
-    public static int AvgDistanceFromGhosts(Game state) {
-        int sum = 0;
-        int pacmanIndex = state.getPacmanCurrentNodeIndex();
-        for (GHOST ghost : GHOST.values()) {
-            sum += state.getDistance(pacmanIndex, state.getGhostCurrentNodeIndex(ghost), DM.PATH);
+    public static int ghostDistAvg(Game state) {
+        int numOfGhosts = GHOST.values().length;
+        double[] ghostDistances = new double[numOfGhosts];
+
+        for (int i = 0; i < numOfGhosts; i++) {
+            GHOST g = GHOST.values()[i];
+            ghostDistances[i] = state.getDistance(
+                    state.getPacmanCurrentNodeIndex(),
+                    state.getGhostCurrentNodeIndex(g),
+                    DM.PATH
+            );
         }
-        return sum / 4;
+
+        return ((int) Arrays.stream(ghostDistances).sum()) / numOfGhosts;
     }
 
-    public MctsNode Expand() {
+    public Node Expand() {
 
         MOVE nextMove = untriedMove(game);
 
         if (nextMove != game.getPacmanLastMoveMade().opposite()) {
-            MctsNode expandedChild = GetClosestJunctionInDir(nextMove);
+            Node expandedChild = GetClosestJunctionInDir(nextMove);
             expandedChild.actionMove = nextMove;
-            MctsController.tree_depth++;
+            MctsAgent.tree_depth++;
             this.children.add(expandedChild);
             expandedChild.parent = this;
             return expandedChild;
@@ -58,10 +63,10 @@ public class MctsNode {
         return this;
     }
 
-    public MctsNode GetClosestJunctionInDir(MOVE dir) {
+    public Node GetClosestJunctionInDir(MOVE dir) {
 
         Game state = game.copy();
-        Controller<EnumMap<GHOST, MOVE>> ghostController = MctsController.ghosts;
+        Controller<EnumMap<GHOST, MOVE>> ghostController = MctsAgent.ghosts;
 
         int from = state.getPacmanCurrentNodeIndex();
         int current = from;
@@ -94,7 +99,7 @@ public class MctsNode {
         //dead during transition
         if (livesAfter < livesBefore) {
             transition_reward = 0.0f;
-        } else if (capsulesAfter < capsulesBefore && AvgDistanceFromGhosts(state) > 100) {
+        } else if (capsulesAfter < capsulesBefore && ghostDistAvg(state) > 100) {
             transition_reward = 0.0f;
         }
         //alive but no pills eaten
@@ -107,7 +112,7 @@ public class MctsNode {
         }
 
         //return the child node with updated state and junction number
-        MctsNode child = new MctsNode(this, state, current);
+        Node child = new Node(this, state, current);
         child.deltaReward = transition_reward;
         return child;
     }

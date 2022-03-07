@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Random;
 
-import Controllers.AlphaBetaController;
-import Controllers.MinimaxController;
-import Controllers.MctsController;
+import Agents.AlphaBetaAgent;
+import Agents.MinimaxAgent;
+import Agents.MctsAgent;
 import pacman.controllers.Controller;
 import pacman.controllers.HumanController;
 import pacman.controllers.examples.AggressiveGhosts;
@@ -22,7 +22,7 @@ import pacman.controllers.examples.StarterGhosts;
 import pacman.game.Game;
 import pacman.game.GameView;
 import static pacman.game.Constants.*;
-import Controllers.HeuristicController;
+import Agents.HeuristicAgent;
 
 /**
  * This class may be used to execute the game in timed or un-timed modes, with or without
@@ -60,16 +60,16 @@ public class Executor
 		Controller<MOVE> agent;
 		switch (agentName) {
 			case "MctsController":
-				agent = new MctsController();
+				agent = new MctsAgent();
 				break;
 			case "HeuristicController":
-				agent = new HeuristicController();
+				agent = new HeuristicAgent();
 				break;
 			case "MinimaxController":
-				agent = new MinimaxController(depth);
+				agent = new MinimaxAgent(depth);
 				break;
 			default:
-				agent = new AlphaBetaController(depth);
+				agent = new AlphaBetaAgent(depth);
 				break;
 		}
 

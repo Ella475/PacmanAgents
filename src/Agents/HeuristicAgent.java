@@ -26,17 +26,17 @@ public class HeuristicAgent extends Controller<MOVE> {
     }
 
     public static double getGameScore(Game state) {
-        if (state.wasPacManEaten()) return Double.NEGATIVE_INFINITY;
+        if (state.isPacmanDead()) return Double.NEGATIVE_INFINITY;
 
         double foodScore = 100 * hasFood(state);
         double activeGhostScore = 0;
         double scaredGhostScore = 50 * hasScaredGhost(state);
         double capsuleScore = 100 * hasCapsule(state);
 
-        int pacmanIndex = state.getPacmanCurrentNodeIndex();
+        int pacmanIndex = state.getPacmanPosition();
 
         ArrayList<Integer> distanceToFood = new ArrayList<>();
-        for (int i : state.getActivePillsIndices()) {
+        for (int i : state.getRemainingPillsIndices()) {
             distanceToFood.add(state.getShortestPathDistance(pacmanIndex, i));
         }
 
@@ -97,7 +97,7 @@ public class HeuristicAgent extends Controller<MOVE> {
     @Override
     public MOVE getMove(Game game, long timeDue) {
 
-        MOVE[] moves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
+        MOVE[] moves = game.getPossibleMoves(game.getPacmanPosition());
         Map<MOVE, Double> scores = new HashMap<>();
         for (MOVE m : moves) {
             scores.put(m, getScoreOfMove(game, m));

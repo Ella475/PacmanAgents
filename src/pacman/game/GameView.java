@@ -232,7 +232,7 @@ public final class GameView extends JComponent
      */
     private void drawPacMan()
     {
-    	int pacLoc=game.getPacmanCurrentNodeIndex();
+    	int pacLoc=game.getPacmanPosition();
     	
     	MOVE tmpLastPacManMove=game.getPacmanLastMoveMade();
     	
@@ -278,7 +278,7 @@ public final class GameView extends JComponent
      */
     private void drawLives()
     {
-    	for(int i=0;i<game.getPacmanNumberOfLivesRemaining()-1;i++) //-1 as lives remaining includes the current life
+    	for(int i = 0; i<game.getLivesRemaining()-1; i++) //-1 as lives remaining includes the current life
     		bufferGraphics.drawImage(images.getPacManForExtraLives(),210-(30*i)/2,260,null);
     }
     

@@ -39,7 +39,7 @@ public class AlphaBetaAgent extends Controller<MOVE> {
         double v;
 
         if (agentIndex == 0) {
-            moves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
+            moves = game.getPossibleMoves(game.getPacmanPosition());
             v = Double.NEGATIVE_INFINITY;
 
         } else {

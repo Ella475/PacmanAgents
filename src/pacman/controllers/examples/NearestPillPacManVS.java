@@ -23,8 +23,8 @@ public final class NearestPillPacManVS extends Controller<MOVE>
 	@SuppressWarnings("deprecation")
 	public MOVE getMove(Game game,long timeDue)
 	{		
-		int currentNodeIndex=game.getPacmanCurrentNodeIndex();	
-		int[] activePills=game.getActivePillsIndices();
+		int currentNodeIndex=game.getPacmanPosition();
+		int[] activePills=game.getRemainingPillsIndices();
 		int[] activePowerPills=game.getActivePowerPillsIndices();
 		int[] targetNodeIndices=new int[activePills.length+activePowerPills.length];
 		
@@ -78,6 +78,6 @@ public final class NearestPillPacManVS extends Controller<MOVE>
 //			if(game.getGhostLairTime(ghostType)==0)
 //				GameView.addPoints(game,colors[index++],game.getAStarPath(game.getGhostCurrentNodeIndex(ghostType),currentNodeIndex,game.getGhostLastMoveMade(ghostType)));
 	
-		return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),nearest,DM.PATH);
+		return game.getNextMoveTowardsTarget(game.getPacmanPosition(),nearest,DM.PATH);
 	}
 }

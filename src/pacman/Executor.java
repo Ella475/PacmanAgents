@@ -42,7 +42,7 @@ public class Executor
 	{
 		// change parameters
 		int delay=1;
-		boolean visual=true;
+		boolean visual=false;
 		boolean timeIt = false;
 		int numTrials=100;
 		int depth = 2;

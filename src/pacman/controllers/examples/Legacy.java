@@ -23,7 +23,7 @@ public class Legacy extends Controller<EnumMap<GHOST,MOVE>>
 	{
 		myMoves.clear();
 		
-		int targetNode=game.getPacmanCurrentNodeIndex();
+		int targetNode=game.getPacmanPosition();
 		
 		if(game.doesGhostRequireAction(GHOST.BLINKY))
 			myMoves.put(GHOST.BLINKY,

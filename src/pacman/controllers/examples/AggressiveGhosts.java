@@ -31,7 +31,7 @@ public final class AggressiveGhosts extends Controller<EnumMap<GHOST,MOVE>>
 			{
 				if(rnd.nextFloat()<CONSISTENCY)	//approach/retreat from the current node that Ms Pac-Man is at
 					myMoves.put(ghost,game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
-							game.getPacmanCurrentNodeIndex(),game.getGhostLastMoveMade(ghost),DM.PATH));
+							game.getPacmanPosition(),game.getGhostLastMoveMade(ghost),DM.PATH));
 				else									//else take a random action
 					myMoves.put(ghost,moves[rnd.nextInt(moves.length)]);
 			}

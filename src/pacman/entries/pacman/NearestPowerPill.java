@@ -1,7 +1,5 @@
 package pacman.entries.pacman;
 
-import java.util.Date;
-
 import pacman.controllers.Controller;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
@@ -17,7 +15,7 @@ public class NearestPowerPill extends Controller<MOVE>{
 		int currentNode = 0;
 		
 		while(activePowerPills.length > 0) {
-			currentNode = game.getPacmanCurrentNodeIndex();
+			currentNode = game.getPacmanPosition();
 		
 			activePowerPills = game.getActivePowerPillsIndices();
 			targetNodeIndices = new int[activePowerPills.length];
@@ -26,15 +24,15 @@ public class NearestPowerPill extends Controller<MOVE>{
 				targetNodeIndices[i] = activePowerPills[i];
 			}
 		
-			return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
+			return game.getNextMoveTowardsTarget(game.getPacmanPosition(),
 					game.getClosestNodeIndexFromNodeIndex(currentNode, targetNodeIndices,DM.PATH),DM.PATH);
 		}
 		
-		currentNode = game.getPacmanCurrentNodeIndex();
+		currentNode = game.getPacmanPosition();
 		//get all active pills
-		int[] activePills= game.getActivePillsIndices();
+		int[] activePills= game.getRemainingPillsIndices();
 		
-		return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),
+		return game.getNextMoveTowardsTarget(game.getPacmanPosition(),
 				game.getClosestNodeIndexFromNodeIndex(currentNode, activePills,DM.PATH),DM.PATH);
 	}
 	

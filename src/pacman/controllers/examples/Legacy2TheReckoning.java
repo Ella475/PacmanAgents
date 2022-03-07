@@ -33,7 +33,7 @@ public class Legacy2TheReckoning extends Controller<EnumMap<GHOST,MOVE>>
      */
     public EnumMap<GHOST,MOVE> getMove(Game game,long timeDue)
     {
-		int pacmanIndex=game.getPacmanCurrentNodeIndex();
+		int pacmanIndex=game.getPacmanPosition();
     	
         for(GHOST ghost : GHOST.values())      
         {
@@ -64,7 +64,7 @@ public class Legacy2TheReckoning extends Controller<EnumMap<GHOST,MOVE>>
      */
     private boolean closeToPower(Game game)
     {
-    	int pacmanIndex=game.getPacmanCurrentNodeIndex();
+    	int pacmanIndex=game.getPacmanPosition();
     	int[] powerPillIndices=game.getActivePowerPillsIndices();
     	
     	for(int i=0;i<powerPillIndices.length;i++)
@@ -83,7 +83,7 @@ public class Legacy2TheReckoning extends Controller<EnumMap<GHOST,MOVE>>
      */
     private boolean closeToMsPacMan(Game game,int location)
     {
-    	if(game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(),location)<PACMAN_DISTANCE)
+    	if(game.getShortestPathDistance(game.getPacmanPosition(),location)<PACMAN_DISTANCE)
     		return true;
 
     	return false;
@@ -117,7 +117,7 @@ public class Legacy2TheReckoning extends Controller<EnumMap<GHOST,MOVE>>
     private MOVE getRetreatActions(Game game,GHOST ghost)
     {
     	int currentIndex=game.getGhostCurrentNodeIndex(ghost);
-    	int pacManIndex=game.getPacmanCurrentNodeIndex();
+    	int pacManIndex=game.getPacmanPosition();
     	
         if(game.getGhostEdibleTime(ghost)==0 && game.getShortestPathDistance(currentIndex,pacManIndex)<PACMAN_DISTANCE)
             return game.getApproximateNextMoveTowardsTarget(currentIndex,pacManIndex,game.getGhostLastMoveMade(ghost),DM.PATH);

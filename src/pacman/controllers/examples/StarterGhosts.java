@@ -32,12 +32,12 @@ public final class StarterGhosts extends Controller<EnumMap<GHOST,MOVE>>
 			{
 				if(game.getGhostEdibleTime(ghost)>0 || closeToPower(game))	//retreat from Ms Pac-Man if edible or if Ms Pac-Man is close to power pill
 					myMoves.put(ghost,game.getApproximateNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost),
-							game.getPacmanCurrentNodeIndex(),game.getGhostLastMoveMade(ghost),DM.PATH));
+							game.getPacmanPosition(),game.getGhostLastMoveMade(ghost),DM.PATH));
 				else 
 				{
 					if(rnd.nextFloat()<CONSISTENCY)			//attack Ms Pac-Man otherwise (with certain probability)
 						myMoves.put(ghost,game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
-								game.getPacmanCurrentNodeIndex(),game.getGhostLastMoveMade(ghost),DM.PATH));
+								game.getPacmanPosition(),game.getGhostLastMoveMade(ghost),DM.PATH));
 					else									//else take a random legal action (to be less predictable)
 					{					
 						MOVE[] possibleMoves=game.getPossibleMoves(game.getGhostCurrentNodeIndex(ghost),game.getGhostLastMoveMade(ghost));
@@ -56,7 +56,7 @@ public final class StarterGhosts extends Controller<EnumMap<GHOST,MOVE>>
     	int[] powerPills=game.getPowerPillIndices();
     	
     	for(int i=0;i<powerPills.length;i++)
-    		if(game.isPowerPillStillAvailable(i) && game.getShortestPathDistance(powerPills[i],game.getPacmanCurrentNodeIndex())<PILL_PROXIMITY)
+    		if(game.isPowerPillStillAvailable(i) && game.getShortestPathDistance(powerPills[i],game.getPacmanPosition())<PILL_PROXIMITY)
     			return true;
 
         return false;

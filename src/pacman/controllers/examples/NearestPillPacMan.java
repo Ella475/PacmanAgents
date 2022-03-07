@@ -16,10 +16,10 @@ public class NearestPillPacMan extends Controller<MOVE>
 	 */
 	public MOVE getMove(Game game,long timeDue)
 	{		
-		int currentNodeIndex=game.getPacmanCurrentNodeIndex();
+		int currentNodeIndex=game.getPacmanPosition();
 		
 		//get all active pills
-		int[] activePills=game.getActivePillsIndices();
+		int[] activePills=game.getRemainingPillsIndices();
 		
 		//get all active power pills
 		int[] activePowerPills=game.getActivePowerPillsIndices();
@@ -34,6 +34,6 @@ public class NearestPillPacMan extends Controller<MOVE>
 			targetNodeIndices[activePills.length+i]=activePowerPills[i];		
 		
 		//return the next direction once the closest target has been identified
-		return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(),game.getClosestNodeIndexFromNodeIndex(currentNodeIndex,targetNodeIndices,DM.PATH),DM.PATH);	
+		return game.getNextMoveTowardsTarget(game.getPacmanPosition(),game.getClosestNodeIndexFromNodeIndex(currentNodeIndex,targetNodeIndices,DM.PATH),DM.PATH);
 	}
 }

@@ -24,21 +24,21 @@ public class MinimaxAgent extends Controller<MOVE> {
 
     public static Integer evaluationFunction(Game state) {
         if (state.gameOver()) {
-            if (state.wasPacManEaten())
+            if (state.isPacmanDead())
                 return Integer.MIN_VALUE;
             else
                 return Integer.MAX_VALUE;
         }
 
         int currentScore = state.getScore();
-        int powerPillsLeft = state.getNumberOfActivePowerPills();
-        int pillsLeft = state.getNumberOfActivePills();
+        int powerPillsLeft = state.getAmountOfRemainingPowerPills();
+        int pillsLeft = state.getAmountOfRemainingPills();
 
-        int pacmanIndex = state.getPacmanCurrentNodeIndex();
+        int pacmanIndex = state.getPacmanPosition();
 
 
         ArrayList<Integer> distanceToFood = new ArrayList<>();
-        for (int i : state.getActivePillsIndices()) {
+        for (int i : state.getRemainingPillsIndices()) {
             distanceToFood.add(state.getShortestPathDistance(pacmanIndex, i));
         }
         int closestFood = Collections.min(distanceToFood);
@@ -90,7 +90,7 @@ public class MinimaxAgent extends Controller<MOVE> {
         GHOST currentGhost = null;
 
         if (agentIndex == 0) {
-            moves = game.getPossibleMoves(game.getPacmanCurrentNodeIndex());
+            moves = game.getPossibleMoves(game.getPacmanPosition());
         } else {
             currentGhost = game.getGhosts().get(agentIndex - 1);
             moves = game.getPossibleMoves(game.getGhostCurrentNodeIndex(currentGhost));

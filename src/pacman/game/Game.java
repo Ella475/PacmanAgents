@@ -736,7 +736,7 @@ public final class Game {
 	 * 
 	 * @return whether Ms Pac-Man was eaten.
 	 */
-	public boolean wasPacManEaten() {
+	public boolean isPacmanDead() {
 		return pacmanWasEaten;
 	}
 
@@ -956,7 +956,7 @@ public final class Game {
 	 * 
 	 * @return the pacman current node index
 	 */
-	public int getPacmanCurrentNodeIndex() {
+	public int getPacmanPosition() {
 		return pacman.currentNodeIndex;
 	}
 
@@ -974,7 +974,7 @@ public final class Game {
 	 * 
 	 * @return the number of lives remaining
 	 */
-	public int getPacmanNumberOfLivesRemaining() {
+	public int getLivesRemaining() {
 		return pacman.numberOfLivesRemaining;
 	}
 
@@ -1073,7 +1073,7 @@ public final class Game {
 	 * 
 	 * @return the number of active pills
 	 */
-	public int getNumberOfActivePills() {
+	public int getAmountOfRemainingPills() {
 		return pills.cardinality();
 	}
 
@@ -1082,7 +1082,7 @@ public final class Game {
 	 * 
 	 * @return the number of active power pills
 	 */
-	public int getNumberOfActivePowerPills() {
+	public int getAmountOfRemainingPowerPills() {
 		return powerPills.cardinality();
 	}
 
@@ -1102,7 +1102,7 @@ public final class Game {
 	 * 
 	 * @return the active pills indices
 	 */
-	public int[] getActivePillsIndices() {
+	public int[] getRemainingPillsIndices() {
 		int[] indices = new int[pills.cardinality()];
 
 		int index = 0;

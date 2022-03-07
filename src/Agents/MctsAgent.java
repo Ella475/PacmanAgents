@@ -34,8 +34,8 @@ public class MctsAgent extends Controller<MOVE> {
         //Hunt edible ghosts if not far away
         for (GHOST ghost : GHOST.values()) {
             if (game.getGhostEdibleTime(ghost) > 0) {
-                if (game.getShortestPathDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost)) < hunt_dist) {
-                    return game.getNextMoveTowardsTarget(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost), DM.PATH);
+                if (game.getShortestPathDistance(game.getPacmanPosition(), game.getGhostCurrentNodeIndex(ghost)) < hunt_dist) {
+                    return game.getNextMoveTowardsTarget(game.getPacmanPosition(), game.getGhostCurrentNodeIndex(ghost), DM.PATH);
                 }
             }
         }
@@ -52,10 +52,10 @@ public class MctsAgent extends Controller<MOVE> {
 
 
     public MOVE FollowPath(MOVE dir, Game state) {
-        MOVE[] possibleMoves = state.getPossibleMoves(state.getPacmanCurrentNodeIndex());
+        MOVE[] possibleMoves = state.getPossibleMoves(state.getPacmanPosition());
         ArrayList<MOVE> moves = new ArrayList<>(Arrays.asList(possibleMoves));
 
-        int current = state.getPacmanCurrentNodeIndex();
+        int current = state.getPacmanPosition();
         //EVADE GHOSTS DURING PATH
         ArrayList<MOVE> getAwayMove = new ArrayList<>();
         ArrayList<Integer> closeGhostDists = new ArrayList<>();
@@ -83,13 +83,13 @@ public class MctsAgent extends Controller<MOVE> {
     }
 
     private boolean pacmanInJunction(Game game) {
-        return game.isJunction(game.getPacmanCurrentNodeIndex());
+        return game.isJunction(game.getPacmanPosition());
     }
 
     public MOVE MctsSearch(Game game) {
 
         //create root node with state0
-        Node root = new Node(null, game, game.getPacmanCurrentNodeIndex());
+        Node root = new Node(null, game);
 
         long start = new Date().getTime();
 
@@ -108,7 +108,7 @@ public class MctsAgent extends Controller<MOVE> {
             return new RandomPacMan().getMove(game, -1);
         }
 
-        return bestChild.actionMove;
+        return bestChild.action;
     }
 
 
@@ -116,9 +116,9 @@ public class MctsAgent extends Controller<MOVE> {
         if (nd == null) {
             return null;
         }
-        while (!nd.isTerminalGameState()) {
+        while (!nd.isGameOver()) {
             if (!nd.isFullyExpanded()) {
-                return nd.Expand();
+                return nd.expend();
             } else {
                 nd = SelectionPolicy(BestChild(nd, C));
                 if (nd == null) {
@@ -136,7 +136,7 @@ public class MctsAgent extends Controller<MOVE> {
             return 0;
 
         // If died on the way to the junction
-        if (nd.deltaReward == 0.0f)
+        if (nd.reward == 0.0f)
             return 0;
 
         int steps = 0;
@@ -144,8 +144,8 @@ public class MctsAgent extends Controller<MOVE> {
         Controller<EnumMap<GHOST, MOVE>> ghostController = ghosts;
 
         Game state = nd.game.copy();
-        int pillsBefore = state.getNumberOfActivePills();
-        int livesBefore = state.getPacmanNumberOfLivesRemaining();
+        int pillsBefore = state.getAmountOfRemainingPills();
+        int livesBefore = state.getLivesRemaining();
 
         // simulate
         while (!state.gameOver()) {
@@ -161,18 +161,18 @@ public class MctsAgent extends Controller<MOVE> {
         }
 
         // DEATH CONDITION
-        int livesAfter = state.getPacmanNumberOfLivesRemaining();
+        int livesAfter = state.getLivesRemaining();
         if (livesAfter < livesBefore) {
             return 0.0f;
         }
 
         // Maze level completed
-        if (state.getNumberOfActivePills() == 0) {
+        if (state.getAmountOfRemainingPills() == 0) {
             return 1.0f;
         }
 
         //reward based on pills eaten
-        return 1.0f - ((float) state.getNumberOfActivePills() / ((float) pillsBefore));
+        return 1.0f - ((float) state.getAmountOfRemainingPills() / ((float) pillsBefore));
     }
 
     public Node BestChild(Node nd, double C) {
@@ -193,14 +193,14 @@ public class MctsAgent extends Controller<MOVE> {
     }
 
     private double UCTvalue(Node nd, double C) {
-        return (float) ((nd.deltaReward / nd.visitCount) + C * Math.sqrt(2 * Math.log(nd.parent.visitCount) / nd.visitCount));
+        return (float) ((nd.reward / nd.visitCount) + C * Math.sqrt(2 * Math.log(nd.parent.visitCount) / nd.visitCount));
     }
 
-    private void Backpropagation(Node currentNode, double reward) {
-        while (currentNode != null) {
-            currentNode.visitCount++;
-            currentNode.deltaReward += reward;
-            currentNode = currentNode.parent;
+    private void Backpropagation(Node node, double reward) {
+        while (node != null) {
+            node.incrementVisitCount();
+            node.reward += reward;
+            node = node.parent;
         }
     }
 }

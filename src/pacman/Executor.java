@@ -41,10 +41,15 @@ public class Executor
 	public static void main(String[] args)
 	{
 		// change parameters
-		int delay=1;
-		boolean visual=false;
+		// delay between frames in game
+		int delay=3;
+		// run with visuals or in background
+		boolean visual=true;
+		// time the game
 		boolean timeIt = false;
+		// how many games to run if visual == false
 		int numTrials=100;
+		// depth of agents such as Minimax and AlphaBeta
 		int depth = 2;
 
 		// Choose pacman controller:

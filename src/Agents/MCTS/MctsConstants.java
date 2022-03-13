@@ -1,5 +1,8 @@
 package Agents.MCTS;
 
+/**
+ * MCTS agent constants.
+ */
 public class MctsConstants {
     //CONSTANTS
     public static final double C = 1.0f / Math.sqrt(2.0f);

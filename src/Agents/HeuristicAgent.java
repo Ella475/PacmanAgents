@@ -11,20 +11,43 @@ import pacman.game.Game;
 
 public class HeuristicAgent extends Controller<MOVE> {
 
+    /**
+     * ghosts controller of the game
+     */
     public static Controller<EnumMap<GHOST, MOVE>> ghosts = new StarterGhosts();
 
+    /**
+     * Did pacman eat a pill when transitioning into this game state.
+     * @param game a copy of the game state
+     * @return 1 if pill eaten, 0 otherwise.
+     */
     public static int hasFood(Game game) {
         return game.wasPillEaten() ? 1 : 0;
     }
 
+    /**
+     * did pacman eat a scared ghost
+     * @param game a copy of the game state
+     * @return 1 if so, 0 otherwise.
+     */
     public static int hasScaredGhost(Game game) {
         return game.getNumGhostsEaten() > 0 ? 1 : 0;
     }
 
+    /**
+     * did pacman eat a powerPill / Capsule?
+     * @param game  a copy of the game state
+     * @return 1 if so, 0 otherwise
+     */
     public static int hasCapsule(Game game) {
         return game.wasPowerPillEaten() ? 1 : 0;
     }
 
+    /**
+     * Scoring function of a certain state.
+     * @param state a copy of the game state
+     * @return the score of a state.
+     */
     public static double getGameScore(Game state) {
         if (state.isPacmanDead()) return Double.NEGATIVE_INFINITY;
 
@@ -87,6 +110,12 @@ public class HeuristicAgent extends Controller<MOVE> {
         return foodScore + activeGhostScore + scaredGhostScore + capsuleScore;
     }
 
+    /**
+     * Scoring of a move from a position.
+     * @param game a copy of the game state
+     * @param m move to test
+     * @return score of that move from game state
+     */
     public static double getScoreOfMove(Game game, MOVE m) {
         Game state = game.copy();
         state.advanceGame(m, ghosts.getMove(state, System.currentTimeMillis()));
@@ -94,6 +123,12 @@ public class HeuristicAgent extends Controller<MOVE> {
         return getGameScore(state) - neutralPenalty;
     }
 
+    /**
+     * get the best move to make (here, check all possible moves from 'game' state).
+     * @param game A copy of the current game
+     * @param timeDue The time the next move is due
+     * @return the move to make.
+     */
     @Override
     public MOVE getMove(Game game, long timeDue) {
 

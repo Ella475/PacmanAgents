@@ -16,12 +16,21 @@ import java.util.EnumMap;
 
 import static Agents.MCTS.MctsConstants.*;
 
-
+/**
+ * Monte carlo agent class. uses the Monte Carlo Tree Search algorithm to determine the best
+ * course of action from a given position using the UCT formula: argmax(s, a) = Q(s, a) + K * sqrt(ln(n) / (n_p))
+ */
 public class MctsAgent extends Controller<MOVE> {
 
     public static Controller<EnumMap<GHOST, MOVE>> ghosts = new StarterGhosts();
     public static int tree_depth = 0;
 
+    /**
+     * get the best move to make from this position
+     * @param game A copy of the current game
+     * @param timeDue The time the next move is due
+     * @return move.
+     */
     @Override
     public MOVE getMove(Game game, long timeDue) {
 
@@ -46,6 +55,13 @@ public class MctsAgent extends Controller<MOVE> {
     }
 
 
+    /**
+     * keep walking in direction, check if we can move from one junction to another without
+     * tackling any ghosts.
+     * @param dir the direction.
+     * @param state a copy of game state
+     * @return move to make that doesn't get us killed.
+     */
     public MOVE keepFollowingPath(MOVE dir, Game state) {
         MOVE[] possibleMoves = state.getPossibleMoves(state.getPacmanPosition());
         ArrayList<MOVE> moves = new ArrayList<>(Arrays.asList(possibleMoves));
@@ -77,10 +93,19 @@ public class MctsAgent extends Controller<MOVE> {
         return moves.get(0);
     }
 
+    /** is pacman in junction
+     * @param game a copy of game state
+     * @return boolean
+     */
     private boolean pacmanInJunction(Game game) {
         return game.isJunction(game.getPacmanPosition());
     }
 
+    /**
+     * make a variant of the selection policy such that we are interested in the move to make, not the child node.
+     * @param game a copy of game state
+     * @return the move to take from game state.
+     */
     public MOVE SearchForMove(Game game) {
 
         //create root node with state0
@@ -97,7 +122,11 @@ public class MctsAgent extends Controller<MOVE> {
         return bestChild==null ? new RandomPacMan().getMove(game, -1) : bestChild.action;
     }
 
-
+    /**
+     * Selection policy for the MCTS algorithm.
+     * @param node the node from which we select a child.
+     * @return child node selected
+     */
     public Node selection(Node node) {
 
         if (node == null) return null;
@@ -114,7 +143,11 @@ public class MctsAgent extends Controller<MOVE> {
         return node;
     }
 
-
+    /**
+     * Simulation policy, run simulation from a given node.
+     * @param node start point of simulation.
+     * @return score of simulation
+     */
     public float simulation(Node node) {
         // Check null
         if (node == null)
@@ -160,6 +193,12 @@ public class MctsAgent extends Controller<MOVE> {
         return 1.0f - ((float) state.getAmountOfRemainingPills() / ((float) pillsBefore));
     }
 
+    /**
+     * get the best child from node nd, give exploration constant C.
+     * @param nd parent node
+     * @param C exploration constant
+     * @return most promising child node.
+     */
     public Node BestChild(Node nd, double C) {
         Node bestChild = null;
         double bestValue = -1.0f;
@@ -177,12 +216,23 @@ public class MctsAgent extends Controller<MOVE> {
         return bestChild;
     }
 
+    /**
+     * UCT formula
+     * @param node node to score
+     * @param C exp. constant
+     * @return the score of that node
+     */
     private double UCT(Node node, double C) {
         double uct = (node.reward / node.visitCount) +
                 C * Math.sqrt(2 * Math.log(node.parent.visitCount) / node.visitCount);
         return (float) uct;
     }
 
+    /**
+     * backprop the score of simulation throughout the parent nodes
+     * @param node starting point of simulation
+     * @param reward the score that needs to be propagated back.
+     */
     private void backpropagation(Node node, double reward) {
         while (node != null) {
             node.incrementVisitCount();

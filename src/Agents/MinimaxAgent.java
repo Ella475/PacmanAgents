@@ -9,19 +9,43 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 
-
+/**
+ * Minimax agent class. Has a depth variable, that determines the depth of the
+ * minimax tree, and an evaluation function.
+ */
 public class MinimaxAgent extends Controller<MOVE> {
 
+    /**
+     * tree depth
+     */
     public int treeDepth;
 
+    /**
+     * constructor
+     * @param d: depth
+     */
     public MinimaxAgent(int d) {
         this.treeDepth = d;
     }
 
+    /**
+     * helper function for determining quality of certain layer's solution.
+     * @param a: first
+     * @param b: second
+     * @param isGreater: do we check is larger or is smaller.
+     * @return true if condition apply, false otherwise
+     */
     public boolean compare(int a, int b, boolean isGreater) {
         return isGreater == (a > b);
     }
 
+    /**
+     * Evaluation function for states.
+     * Takes into consideration: score, pills, powerPills, scaredGhosts, activeGhosts.
+     * Weights for each variable is described in the bottom of the function.
+     * @param state: the game state of which we determine the quality.
+     * @return the evaluation score of that state.
+     */
     public static Integer evaluationFunction(Game state) {
         if (state.gameOver()) {
             if (state.isPacmanDead())
@@ -73,6 +97,15 @@ public class MinimaxAgent extends Controller<MOVE> {
                 -4 * pillsLeft);
     }
 
+    /**
+     * Minimax evaluation function. Checks the best option to take from
+     * a given state.
+     * @param game: current game state.
+     * @param agentIndex: the index of the agent for which we search the best course of action.
+     *                  0 - pacman, 1< - ghost
+     * @param depth: how far down the minimax tree we went.
+     * @return the best pair of move and score from current position for current agent.
+     */
     public MoveScorePair<MOVE, Integer> minimax(Game game, int agentIndex, int depth) {
         int numOfAgents = game.getGhosts().size() + 1;
 
@@ -130,6 +163,12 @@ public class MinimaxAgent extends Controller<MOVE> {
         return best;
     }
 
+    /**
+     * get the move pacman needs to make from this position.
+     * @param game A copy of the current game
+     * @param timeDue The time the next move is due
+     * @return the move to make.
+     */
     @Override
     public MOVE getMove(Game game, long timeDue) {
         return minimax(game, 0, this.treeDepth).move;

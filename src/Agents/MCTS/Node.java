@@ -12,9 +12,15 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Random;
 
-
+/**
+ * Node class of MCTS agent. node consists of variables that represent current state and relative score
+ * of all simulations made through that state.
+ */
 public class Node {
 
+    /**
+     * Public variables of Node of MCTS agent
+     */
     public Node parent;
     public Game game;
     public int visitCount = 0;
@@ -24,15 +30,28 @@ public class Node {
     public ArrayList<MOVE> triedActions = new ArrayList<>();
     public ArrayList<MOVE> untriedActions = new ArrayList<>();
 
+    /**
+     * constructor function
+     * @param parent parent node
+     * @param game a copy of game state
+     */
     public Node(Node parent, Game game) {
         this.parent = parent;
         this.game = game;
     }
 
+    /**
+     * increment the visit count.
+     */
     public void incrementVisitCount() {
         this.visitCount++;
     }
 
+    /**
+     * checks average distance from all ghosts in game.
+     * @param state a copy of game state
+     * @return average distance (int)
+     */
     public static int ghostDistAvg(Game state) {
         int numOfGhosts = GHOST.values().length;
         double[] ghostDistances = new double[numOfGhosts];
@@ -49,6 +68,10 @@ public class Node {
         return ((int) Arrays.stream(ghostDistances).sum()) / numOfGhosts;
     }
 
+    /**
+     * function that expends this node.
+     * @return an expended child, or otherwise the node itself, because we cant expend anymore.
+     */
     public Node expend() {
 
         MOVE nextMove = newMove(game);
@@ -65,6 +88,11 @@ public class Node {
         return this;
     }
 
+    /**
+     * walks in 'dir' direction and checks what is the nearest junction pacman can get to.
+     * @param dir the direction of pacman movement.
+     * @return the node of the closest junction in this direction.
+     */
     public Node getNearestJunction(MOVE dir) {
 
         Game state = game.copy();
@@ -122,6 +150,10 @@ public class Node {
         return node;
     }
 
+    /**
+     * terminate function, check if game over.
+     * @return boolean.
+     */
     public boolean isGameOver() {
         return game.isPacmanDead() || game.getRemainingPillsIndices().length == 0;
     }
@@ -133,7 +165,11 @@ public class Node {
         return untriedMove;
     }
 
-    //Pick randomly non-tried action
+    /**
+     * pick a move from all untried moves yet.
+     * @param game a copy of game state
+     * @return a move.
+     */
     public MOVE newMove(Game game) {
 
         untriedActions.clear();
@@ -150,6 +186,10 @@ public class Node {
         return generateRandomMove();
     }
 
+    /**
+     * check if our node is fully expended or not.
+     * @return boolean
+     */
     public boolean isFullyExpanded() {
         int pacman = game.getPacmanPosition();
         MOVE[] possibleMoves = game.getPossibleMoves(pacman);

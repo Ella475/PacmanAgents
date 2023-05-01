@@ -32,8 +32,3 @@ We found that heuristics worked well initially, but as the ghosts became smarter
 
 ### Contributing
 Feel free to fork this repository and make your own contributions! We welcome pull requests and suggestions for improving the code or trying out different algorithms.
-
-### Installation:
-1. Clone the repository
-2. Install the requirements
-3. Run the game
